@@ -1,6 +1,7 @@
 # Updating the registrations data
 
-New registrations will keep coming in until the event. To refresh the list (e.g. the Saturday re-export):
+**Planned refresh: Friday 9 October 2026** (the day before the AGM) — both `registrations` and `ActiveMembersList`.
+To refresh:
 
 ## Do
 1. Open the **same** Google Sheet (the one the Apps Script is attached to).

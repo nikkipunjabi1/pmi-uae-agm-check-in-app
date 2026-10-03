@@ -12,7 +12,7 @@
  *   GET  ?action=lookup&id=9620&key=K       → single registration (fresh read)
  *   POST {action:'checkin', id, key}        → mark Checked In = Yes + time
  *   POST {action:'undo', id, key}           → revert a check-in
- *   POST {action:'addGuest', firstName, lastName, type, track, org, ref, key}
+ *   POST {action:'addGuest', firstName, lastName, type, lanyard, org, ref, key}
  *                                           → add a walk-in guest/speaker (checked in immediately)
  *
  * Guests/speakers live in their own "Guests" tab (created automatically) with ids like G-1, G-2…
@@ -206,7 +206,7 @@ function addGuest_(p) {
     });
     var id = 'G-' + next;
     var ts = now_();
-    var lanyard = trackToLanyard_(p.track);
+    var lanyard = guestLanyard_(p.lanyard, p.type);
     var row = [id, String(p.type || 'Guest').trim(), firstName, lastName, String(p.org || '').trim(), lanyard, 'Yes', ts, ref];
     var rowNum = sh.getLastRow() + 1;
     sh.getRange(rowNum, 1, 1, row.length).setNumberFormat('@').setValues([row]);
@@ -279,7 +279,8 @@ function guestRecord_(r, idx) {
     email: '',
     org: String(r[idx.org] || '').trim(),
     guestType: String(r[idx.type] || 'Guest').trim(),
-    track: lanyardToTrack_(r[idx.lanyard]),
+    track: '',
+    lanyard: String(r[idx.lanyard] || '').trim().toUpperCase(),
     member: 'guest',
     paymentStatus: '',
     checkedIn: isYes_(r[idx.checkedIn]),
@@ -288,13 +289,12 @@ function guestRecord_(r, idx) {
   };
 }
 
-function trackToLanyard_(t) {
-  t = String(t || '').toUpperCase();
-  return t === 'AI' ? 'Blue (AI)' : t === 'SUSTAINABILITY' ? 'Green (Sustainability)' : '';
-}
-function lanyardToTrack_(l) {
-  l = String(l || '').toLowerCase();
-  return /blue|\bai\b/.test(l) ? 'AI' : /green|sustain/.test(l) ? 'SUSTAINABILITY' : '';
+// Speakers get red, volunteers yellow, every other guest type blue (the desk sends its colour; this is the fallback).
+function guestLanyard_(lanyard, type) {
+  var l = String(lanyard || '').trim().toUpperCase();
+  if (/^(RED|YELLOW|BLUE|GREEN)$/.test(l)) return l.charAt(0) + l.slice(1).toLowerCase();
+  var t = String(type || '').trim().toLowerCase();
+  return t === 'speaker' ? 'Red' : t === 'volunteer' ? 'Yellow' : 'Blue';
 }
 
 function readMembers_() {

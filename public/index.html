@@ -86,6 +86,8 @@
             <div class="legend">
               <span class="legend-item"><i class="dot dot-blue"></i>AI → <strong>Blue</strong></span>
               <span class="legend-item"><i class="dot dot-green"></i>Sustainability → <strong>Green</strong></span>
+              <span class="legend-item"><i class="dot dot-red"></i>Speaker → <strong>Red</strong></span>
+              <span class="legend-item"><i class="dot dot-yellow"></i>Volunteer → <strong>Yellow</strong></span>
             </div>
           </div>
           <div id="result" hidden></div>
@@ -145,13 +147,7 @@
         <label class="field">First name<input id="gFirst" type="text" required autocapitalize="words" /></label>
         <label class="field">Last name<input id="gLast" type="text" autocapitalize="words" /></label>
       </div>
-      <div class="field">Type<div class="chips" id="gTypes"></div></div>
-      <div class="field">Lanyard
-        <div class="chips chips-lanyard">
-          <label class="chip chip-blue"><input type="radio" name="gTrack" value="AI" required /><span>Blue · AI</span></label>
-          <label class="chip chip-green"><input type="radio" name="gTrack" value="SUSTAINABILITY" /><span>Green · Sustainability</span></label>
-        </div>
-      </div>
+      <div class="field">Type <span class="muted">(sets the lanyard colour)</span><div class="chips" id="gTypes"></div></div>
       <label class="field">Organisation <span class="muted">(optional)</span><input id="gOrg" type="text" /></label>
       <div class="dialog-actions">
         <button type="button" class="btn btn-secondary" id="guestCancel">Cancel</button>

@@ -12,7 +12,7 @@
 | Email used by more than one registration | 15 | Each registration ID is checked in separately |
 
 There's no shared ID between the two tabs (`User ID` is the website account; `Personid` is the PMI ID), so **email is the match key**.
-The ~36% unmatched rate is high. It is most likely people who registered with a different email from their PMI profile. That's why non-members get an override button instead of being blocked.
+The ~36% unmatched rate is because the `ActiveMembersList` tab is out of date. It will be refreshed on **Friday 9 Oct 2026**, together with the registrations. Some people may still have registered with a different email from their PMI profile, so non-members get an override button instead of being blocked.
 
 ## Architecture
 
@@ -28,7 +28,18 @@ The ~36% unmatched rate is high. It is most likely people who registered with a 
 - **Guests in their own tab.** Walk-in guests and speakers go to `Guests` (IDs `G-1`, `G-2`, …) so a registrations refresh can't wipe them.
 - **No payment information is shown** (all members are treated as paid). The `Payment Status` column is only read to flag cancelled registrations.
 
+## Lanyard colours
+
+| Who | Colour |
+|---|---|
+| Registrant on the AI track | Blue |
+| Registrant on the Sustainability track | Green |
+| Speaker | Red |
+| Volunteer | Yellow |
+| VIP / Guest / Sponsor / any other walk-in | Blue |
+
+Guest colours are configured in `public/config.js` (`GUEST_LANYARDS`, `DEFAULT_GUEST_LANYARD`). The colour is also written to the `Lanyard` column of the `Guests` tab.
+
 ## Open questions
 
-- Policy for the ~338 non-matched registrants: check in anyway, or verify in the PMI app first? The app currently allows an override with confirmation.
-- Do speakers / VIPs get a different lanyard colour? The guest form currently offers Blue (AI) or Green (Sustainability). Adding another colour is a small change.
+- After Friday's member-list refresh: should anyone still unmatched be checked in with the override, or sent to verify in the PMI app first? The app currently allows an override with confirmation.

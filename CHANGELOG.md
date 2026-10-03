@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — v1.1.0
+- Guest lanyard colour now comes from the type: **Speaker → Red**, **Volunteer → Yellow**, VIP / Guest / Sponsor / other → **Blue**. The form no longer asks for a lanyard.
+- Lanyard colours configurable in `config.js` (`GUEST_LANYARDS`, `DEFAULT_GUEST_LANYARD`).
+- Front end connected to the deployed Apps Script web app.
+- Repository moved to `nikkipunjabi1/pmi-uae-agm-check-in-app`.
+
 ## 2026-10-03 — v1.0.0
 - QR scan check-in: reads the `id` from the pmiuae.org check-in URL and matches it to the `registrations` tab.
 - Active member verification against `ActiveMembersList` (email match, name-match fallback).

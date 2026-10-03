@@ -18,9 +18,18 @@ Registration desk staff scan an attendee's QR code. The app confirms the registr
 
 1. The QR code contains `https://pmiuae.org/index.php?option=com_eventbooking&task=registrant.checkin&id=9620&Itemid=4729`. The app reads the `id` (here `9620`) and matches it to the **ID** column of the `registrations` tab.
 2. **Membership check:** the registration's **Email** is matched (case-insensitive) to **Primaryemail** in `ActiveMembersList`. If the email doesn't match but the first and last name do, the app shows an amber "matched by name" note and still allows check-in.
-3. **Lanyard:** `AI = 1` → **BLUE**, `Sustainability = 1` → **GREEN**, shown as a large coloured banner.
+3. **Lanyard:** shown as a large coloured banner.
+
+   | Who | Lanyard |
+   |---|---|
+   | Registrant, `AI = 1` | **BLUE** |
+   | Registrant, `Sustainability = 1` | **GREEN** |
+   | Speaker | **RED** |
+   | Volunteer | **YELLOW** |
+   | VIP, Guest, Sponsor, any other walk-in | **BLUE** |
+
 4. **Check in** sets `Checked In = Yes` and `Checked In Time = dd-MM-yyyy HH:mm:ss` (Dubai time) on that row.
-5. **Walk-in guests and speakers** who aren't on the sheet are added with **+ Add guest / speaker** (first name, last name, type, lanyard). They are checked in straight away and saved to a separate `Guests` tab.
+5. **Walk-in guests and speakers** who aren't on the sheet are added with **+ Add guest / speaker** (first name, last name, type, optional organisation). The type sets the lanyard colour. They are checked in straight away and saved to a separate `Guests` tab. Types and colours are set in `public/config.js` (`GUEST_TYPES`, `GUEST_LANYARDS`).
 
 | Situation | What the desk sees | Action |
 |---|---|---|
@@ -79,4 +88,4 @@ netlify.toml         publish dir + headers
 
 ## Privacy
 
-The repository is **public**. Never commit attendee data: `*.xlsx` and `*.csv` are git-ignored. The access key is stored only in the Apps Script **Script Properties** and on each desk device. It is never stored in this repo.
+The repository [nikkipunjabi1/pmi-uae-agm-check-in-app](https://github.com/nikkipunjabi1/pmi-uae-agm-check-in-app) is **public**. Never commit attendee data: `*.xlsx` and `*.csv` are git-ignored. The access key is stored only in the Apps Script **Script Properties** and on each desk device. It is never stored in this repo.

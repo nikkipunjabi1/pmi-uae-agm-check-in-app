@@ -335,18 +335,19 @@
       firstName: $('gFirst').value.trim(),
       lastName: $('gLast').value.trim(),
       type: (f.querySelector('input[name=gType]:checked') || {}).value || 'Guest',
-      track: (f.querySelector('input[name=gTrack]:checked') || {}).value || '',
+      track: '',
       org: $('gOrg').value.trim(),
       ref: newRef(),
     };
-    if (!payload.firstName || !payload.track) return;
+    payload.lanyard = guestLanyard(payload.type);
+    if (!payload.firstName) return;
     $('guestDialog').close();
 
     const tmpId = `tmp-${payload.ref.slice(0, 8)}`;
     const at = dubaiNow();
     const rec = {
       id: tmpId, firstName: payload.firstName, lastName: payload.lastName, email: '', org: payload.org,
-      guestType: payload.type, track: payload.track, member: 'guest', paymentStatus: '',
+      guestType: payload.type, track: '', lanyard: payload.lanyard, member: 'guest', paymentStatus: '',
       checkedIn: true, time: at, ref: payload.ref,
     };
     state.records.set(tmpId, rec);
@@ -527,19 +528,31 @@
       : 'not synced';
   }
 
+  /** Lanyard colour for a person: registrants by track, guests by type (Speaker red, Volunteer yellow, others blue). */
+  function guestLanyard(type) {
+    const map = CFG.GUEST_LANYARDS || {};
+    return map[type] || CFG.DEFAULT_GUEST_LANYARD || 'BLUE';
+  }
+  function lanyardOf(r) {
+    if (isGuest(r)) return (/^(BLUE|GREEN|RED|YELLOW)$/.test(r.lanyard) && r.lanyard) || guestLanyard(r.guestType);
+    return r.track === 'AI' ? 'BLUE' : r.track === 'SUSTAINABILITY' ? 'GREEN' : '';
+  }
+  function lanyardSub(r) {
+    if (isGuest(r)) return r.guestType || 'Guest';
+    return r.track === 'AI' ? 'AI track' : 'Sustainability track';
+  }
+
   function lanyardHtml(r) {
-    if (r.track === 'AI') {
-      return `<div class="lanyard lanyard-blue"><div class="l-label">Lanyard</div><div class="l-color">BLUE</div><div class="l-track">AI track</div></div>`;
-    }
-    if (r.track === 'SUSTAINABILITY') {
-      return `<div class="lanyard lanyard-green"><div class="l-label">Lanyard</div><div class="l-color">GREEN</div><div class="l-track">Sustainability track</div></div>`;
+    const colour = lanyardOf(r);
+    if (colour) {
+      return `<div class="lanyard lanyard-${colour.toLowerCase()}"><div class="l-label">Lanyard</div><div class="l-color">${colour}</div><div class="l-track">${esc(lanyardSub(r))}</div></div>`;
     }
     const why = r.track === 'BOTH' ? 'Registered for both tracks' : 'No track selected';
     return `<div class="lanyard lanyard-unknown"><div class="l-label">Lanyard</div><div class="l-color">ASK</div><div class="l-track">${why} — ask: AI (Blue) or Sustainability (Green)?</div></div>`;
   }
 
   function lanyardWord(r) {
-    return r.track === 'AI' ? 'BLUE' : r.track === 'SUSTAINABILITY' ? 'GREEN' : 'the chosen';
+    return lanyardOf(r) || 'the chosen';
   }
 
   function renderResult() {
@@ -629,9 +642,11 @@
   function hideSearchResults() { $('searchResults').hidden = true; }
 
   function trackPill(r) {
-    if (r.track === 'AI') return '<span class="pill pill-blue">Blue · AI</span>';
-    if (r.track === 'SUSTAINABILITY') return '<span class="pill pill-green">Green · Sust.</span>';
-    return '<span class="pill pill-grey">Ask</span>';
+    const colour = lanyardOf(r);
+    if (!colour) return '<span class="pill pill-grey">Ask</span>';
+    const name = colour[0] + colour.slice(1).toLowerCase();
+    const sub = isGuest(r) ? '' : r.track === 'AI' ? ' · AI' : ' · Sust.';
+    return `<span class="pill pill-l-${colour.toLowerCase()}">${name}${sub}</span>`;
   }
   function memberPill(r) {
     if (isGuest(r)) return `<span class="pill pill-purple">${esc(r.guestType || 'Guest')}</span>`;
@@ -796,7 +811,7 @@
         const n = demoDb.filter(isGuest).length + 1;
         const rec = {
           id: `G-${n}`, firstName: p.firstName, lastName: p.lastName, email: '', org: p.org || '',
-          guestType: p.type, track: p.track, member: 'guest', paymentStatus: '', checkedIn: true, time: dubaiNow(), ref: p.ref,
+          guestType: p.type, track: '', lanyard: p.lanyard, member: 'guest', paymentStatus: '', checkedIn: true, time: dubaiNow(), ref: p.ref,
         };
         demoDb.push(rec);
         return delay({ ok: true, record: { ...rec } });
@@ -815,7 +830,7 @@
   function boot() {
     if (CFG.EVENT_NAME) $('eventName').textContent = CFG.EVENT_NAME;
     $('gTypes').innerHTML = (CFG.GUEST_TYPES || ['Speaker', 'Guest']).map((t) =>
-      `<label class="chip"><input type="radio" name="gType" value="${esc(t)}" /><span>${esc(t)}</span></label>`).join('');
+      `<label class="chip"><input type="radio" name="gType" value="${esc(t)}" /><span><i class="dot dot-${guestLanyard(t).toLowerCase()}"></i>${esc(t)}</span></label>`).join('');
     // Share links can carry the key as #key=XXXX; store it and strip it from the address bar.
     const hashKey = new URLSearchParams(location.hash.slice(1)).get('key');
     if (hashKey) {

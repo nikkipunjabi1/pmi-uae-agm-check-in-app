@@ -1,0 +1,9 @@
+# Attendee data must never be committed (the repo is public).
+*.xlsx
+*.xls
+*.csv
+
+.DS_Store
+node_modules/
+.netlify/
+.claude/

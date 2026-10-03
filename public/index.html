@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>AGM 2026 Check-In · PMI UAE Chapter</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <img class="logo" src="assets/pmi-uae-logo.svg" alt="PMI United Arab Emirates Chapter" />
+      <div class="topbar-meta">
+        <span id="syncBadge" class="sync-badge" title="Connection status">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <div>
+        <h1>AGM 2026 Check-In</h1>
+        <p class="muted" id="eventName">PMI UAE Chapter Annual Gathering Meeting 2026</p>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-view="checkin" role="tab" aria-selected="true">Check-in</button>
+        <button class="tab" data-view="list" role="tab" aria-selected="false">Attendees</button>
+      </nav>
+    </div>
+
+    <!-- Summary -->
+    <section class="card stats" aria-label="Live summary">
+      <div class="stat-row stat-row-main">
+        <div class="stat"><span class="num" id="stTotal">–</span><span class="lbl">Registered</span></div>
+        <div class="stat stat-green"><span class="num" id="stIn">–</span><span class="lbl">Checked in</span></div>
+        <div class="stat"><span class="num" id="stPct">–</span><span class="lbl">Arrived</span></div>
+      </div>
+      <div class="progress"><div class="progress-bar" id="stBar"></div></div>
+      <div class="stat-row stat-row-4">
+        <div class="stat stat-blue"><span class="num" id="stAi">–</span><span class="lbl">AI · Blue</span></div>
+        <div class="stat stat-lgreen"><span class="num" id="stSus">–</span><span class="lbl">Sust. · Green</span></div>
+        <div class="stat stat-amber"><span class="num" id="stOverride">–</span><span class="lbl">Non-members</span></div>
+        <div class="stat stat-purple"><span class="num" id="stGuests">–</span><span class="lbl">Guests</span></div>
+      </div>
+    </section>
+
+    <!-- Check-in view -->
+    <section id="view-checkin" class="view">
+      <div class="grid">
+        <div class="card">
+          <div class="card-head">
+            <h2>Scanner</h2>
+            <button id="switchCamBtn" class="btn-ghost btn-sm" hidden>Switch camera</button>
+          </div>
+          <div class="reader">
+            <div id="reader"></div>
+            <div class="reader-placeholder" id="readerPlaceholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4M20 17v.01"/></svg>
+              <p>Tap <strong>Start Scanner</strong> to use the camera</p>
+            </div>
+          </div>
+          <button id="scanBtn" class="btn btn-primary btn-lg">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Start Scanner</span>
+          </button>
+          <form id="manualForm" class="manual" autocomplete="off">
+            <input id="manualInput" type="text" inputmode="search" placeholder="ID, name or email" aria-label="Registration ID, name or email" />
+            <button type="submit" class="btn btn-secondary">Look up</button>
+          </form>
+          <ul id="searchResults" class="search-results" hidden></ul>
+          <button id="addGuestBtn" type="button" class="btn btn-guest">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+            <span>Add guest / speaker</span>
+          </button>
+        </div>
+
+        <div class="card result-card" id="resultCard">
+          <div class="result-empty" id="resultEmpty">
+            <p class="muted">Scan a QR code or search for an attendee.<br/>The lanyard colour shows here.</p>
+            <div class="legend">
+              <span class="legend-item"><i class="dot dot-blue"></i>AI → <strong>Blue</strong></span>
+              <span class="legend-item"><i class="dot dot-green"></i>Sustainability → <strong>Green</strong></span>
+            </div>
+          </div>
+          <div id="result" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Attendee list view -->
+    <section id="view-list" class="view" hidden>
+      <div class="card">
+        <div class="list-toolbar">
+          <input id="listSearch" type="search" placeholder="Search name, email or ID" aria-label="Search attendees" />
+          <div class="seg" role="group" aria-label="Filter">
+            <button class="seg-btn active" data-filter="in">Checked in</button>
+            <button class="seg-btn" data-filter="pending">Not yet</button>
+            <button class="seg-btn" data-filter="all">All</button>
+          </div>
+        </div>
+        <p class="muted small" id="listCount"></p>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Name</th><th>ID</th><th>Lanyard</th><th>Member</th><th>Checked in</th></tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>PMI UAE Chapter · AGM 2026 check-in</span>
+    <span>·</span>
+    <span id="lastSync">not synced</span>
+    <span>·</span>
+    <button id="changeKeyBtn" class="link">Desk key</button>
+  </footer>
+
+  <!-- Access key dialog -->
+  <dialog id="keyDialog" class="dialog">
+    <form method="dialog" id="keyForm">
+      <h3>Enter desk access key</h3>
+      <p class="muted small">Ask the registration lead for the key. It is saved on this device only.</p>
+      <input id="keyInput" type="password" autocomplete="off" placeholder="Access key" required />
+      <p class="error small" id="keyError" hidden></p>
+      <div class="dialog-actions">
+        <button type="submit" class="btn btn-primary">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Walk-in guest / speaker dialog -->
+  <dialog id="guestDialog" class="dialog">
+    <form id="guestForm" autocomplete="off">
+      <h3>Add guest / speaker</h3>
+      <p class="muted small">For people not on the registration sheet. Saving checks them in right away.</p>
+      <div class="field-row">
+        <label class="field">First name<input id="gFirst" type="text" required autocapitalize="words" /></label>
+        <label class="field">Last name<input id="gLast" type="text" autocapitalize="words" /></label>
+      </div>
+      <div class="field">Type<div class="chips" id="gTypes"></div></div>
+      <div class="field">Lanyard
+        <div class="chips chips-lanyard">
+          <label class="chip chip-blue"><input type="radio" name="gTrack" value="AI" required /><span>Blue · AI</span></label>
+          <label class="chip chip-green"><input type="radio" name="gTrack" value="SUSTAINABILITY" /><span>Green · Sustainability</span></label>
+        </div>
+      </div>
+      <label class="field">Organisation <span class="muted">(optional)</span><input id="gOrg" type="text" /></label>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="guestCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Check in guest</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="config.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-03 — v1.2.0
+- Fix: iPhone camera preview was black on first start. Camera permission is now requested before the scan stream opens, and a watchdog restarts the camera if no video arrives.
+- Camera restarts automatically when returning to the app (iOS stops it in the background).
+- "Switch camera" toggles back/front on phones; cycles devices on laptops.
+- Faster scanning: QR-only decoding and the native BarcodeDetector where available (Android Chrome).
+- Bottom spacing so the Netlify badge never covers buttons; desk guide explains how to hide it per phone.
+
 ## 2026-10-03 — v1.1.0
 - Guest lanyard colour now comes from the type: **Speaker → Red**, **Volunteer → Yellow**, VIP / Guest / Sponsor / other → **Blue**. The form no longer asks for a lanyard.
 - Lanyard colours configurable in `config.js` (`GUEST_LANYARDS`, `DEFAULT_GUEST_LANYARD`).

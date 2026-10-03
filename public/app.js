@@ -427,15 +427,44 @@
     showById(id);
   }
 
-  async function startScanner() {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
+  let facing = 'environment';  // phones: toggled by "Switch camera"
+  let starting = false;
+
+  function createScanner() {
+    const opts = { verbose: false, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
+    if (window.Html5QrcodeSupportedFormats) opts.formatsToSupport = [Html5QrcodeSupportedFormats.QR_CODE];
+    return new Html5Qrcode('reader', opts);
+  }
+
+  function cameraConstraint() {
+    // Phones: let the browser pick the main back (or front) lens. Laptops: cycle through device ids.
+    if (isTouch() || camIndex < 0 || !cameras[camIndex]) return { facingMode: facing };
+    return cameras[camIndex].id;
+  }
+
+  function videoAlive() {
+    const v = document.querySelector('#reader video');
+    return !!v && v.readyState >= 2 && v.videoWidth > 0 && !v.paused;
+  }
+
+  async function startScanner(attempt = 0) {
     if (!window.Html5Qrcode) { toast('Scanner failed to load — check the internet connection', 'err'); return; }
-    scanner = scanner || new Html5Qrcode('reader', { verbose: false });
-    const camera = camIndex >= 0 && cameras[camIndex] ? cameras[camIndex].id : { facingMode: 'environment' };
+    if (starting || scanning) return;
+    starting = true;
     $('readerPlaceholder').hidden = true;
     setScanBtn('Starting…', true);
     try {
+      // Ask for permission + list cameras BEFORE opening the scan stream. Doing it while the
+      // stream is live opens a second camera request, which blanks the video on iOS Safari.
+      if (!cameras.length) {
+        cameras = await Html5Qrcode.getCameras().catch(() => []);
+        $('switchCamBtn').hidden = cameras.length < 2;
+      }
+      scanner = scanner || createScanner();
       await scanner.start(
-        camera,
+        cameraConstraint(),
         {
           fps: 12,
           qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.72); return { width: s, height: s }; },
@@ -445,16 +474,32 @@
       );
       scanning = true;
       setScanBtn('Stop Scanner', false);
-      if (!cameras.length) {
-        cameras = await Html5Qrcode.getCameras().catch(() => []);
-        $('switchCamBtn').hidden = cameras.length < 2;
-      }
     } catch (e) {
       scanning = false;
       $('readerPlaceholder').hidden = false;
       setScanBtn('Start Scanner', false);
-      toast(`Camera not available: ${e && e.message ? e.message : e}`, 'err');
+      const raw = String((e && (e.message || e.name)) || e);
+      const msg = /NotAllowed|Permission/i.test(raw)
+        ? 'Camera blocked — allow camera access for this site in the browser settings, then tap Start Scanner'
+        : `Camera not available: ${raw}`;
+      toast(msg, 'err');
+      return;
+    } finally {
+      starting = false;
     }
+    verifyCamera(attempt);
+  }
+
+  /** Some phones (mostly iOS on first permission grant) start with a black preview. Detect and restart. */
+  async function verifyCamera(attempt) {
+    await sleep(1500);
+    if (!scanning || videoAlive()) return;
+    const v = document.querySelector('#reader video');
+    if (v) { try { await v.play(); } catch (_) {} await sleep(400); if (videoAlive()) return; }
+    if (attempt >= 2) { toast('Camera preview not showing — tap Stop, then Start Scanner', 'err'); return; }
+    await stopScanner();
+    await sleep(250);
+    startScanner(attempt + 1);
   }
 
   async function stopScanner() {
@@ -465,9 +510,10 @@
   }
 
   async function switchCamera() {
-    if (cameras.length < 2) return;
-    camIndex = (camIndex + 1) % cameras.length;
+    if (isTouch()) facing = facing === 'environment' ? 'user' : 'environment';
+    else if (cameras.length > 1) camIndex = (camIndex + 1) % cameras.length;
     await stopScanner();
+    await sleep(200);
     startScanner();
   }
 
@@ -764,7 +810,11 @@
     $('guestForm').addEventListener('submit', onGuestSubmit);
     $('guestCancel').addEventListener('click', () => $('guestDialog').close());
     $('changeKeyBtn').addEventListener('click', () => openKeyDialog());
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) schedulePoll(50); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      schedulePoll(50);
+      if (scanning) verifyCamera(0); // iOS stops the camera while the app is in the background
+    });
     window.addEventListener('online', () => schedulePoll(50));
   }
 

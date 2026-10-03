@@ -222,7 +222,7 @@ h2 { font-size: 18px; margin: 0; }
 .pill-red { background: rgba(239,68,68,.18); color: #fca5a5; }
 
 /* ---------- misc ---------- */
-.foot { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; padding: 14px 16px 22px; }
+.foot { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; padding: 14px 16px 80px; } /* bottom space keeps the Netlify badge off the footer */
 .dialog {
   background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 22px; width: min(420px, calc(100vw - 32px));
@@ -303,7 +303,7 @@ h2 { font-size: 18px; margin: 0; }
     display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; margin: 0;
     max-height: 88vh; max-height: 88dvh; overflow-y: auto; min-height: 0;
     border-radius: 20px 20px 0 0; border-bottom: 0;
-    padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
+    padding: 10px 16px calc(64px + env(safe-area-inset-bottom)); /* clear of the Netlify badge */
     box-shadow: 0 -12px 40px rgba(0,0,0,.55);
     animation: sheet-up .22s ease-out;
   }

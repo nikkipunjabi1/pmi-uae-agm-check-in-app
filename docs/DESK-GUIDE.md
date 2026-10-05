@@ -29,7 +29,7 @@
 | **Already checked in at 08:45** | They (or someone with their QR code) were already checked in. Don't give a second lanyard without checking. |
 | **Registration not found** | Type their **name or email** in the search box. If they're still not found, send them to the help desk. |
 | **No QR code** | Search by name or email, then tap the result. |
-| **Speaker / guest not on the list** | Tap **+ Add guest / speaker**, enter their first and last name, choose the type (Speaker, Board Member, VIP, Partner, Volunteer, Guest = white; Delegate - AI = blue; Delegate - Sustainability = green), then tap **Check in guest**. |
+| **Speaker / guest not on the list** | Tap **+ Add guest / speaker**, enter their first and last name (email and phone if they'll share them), choose the type (Speaker, Board Member, VIP, Partner, Volunteer, Guest = white; Delegate - AI = blue; Delegate - Sustainability = green), then tap **Check in guest**. |
 | Wrong person checked in | Open them (search) → **Undo check-in**. |
 | Badge says **Offline · N to sync** | Keep going. Check-ins are saved on the device and sync automatically when the Wi-Fi returns. Don't close the browser tab until it says **● Live** again. |
 

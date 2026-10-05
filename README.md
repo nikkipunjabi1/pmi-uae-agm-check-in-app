@@ -27,7 +27,7 @@ Registration desk staff scan an attendee's QR code. The app confirms the registr
    | Board Member, Volunteer, Speaker, VIP, Partner, Guest | **WHITE** |
 
 4. **Check in** sets `Checked In = Yes` and `Checked In Time = dd-MM-yyyy HH:mm:ss` (Dubai time) on that row.
-5. **Walk-in guests and speakers** who aren't on the sheet are added with **+ Add guest / speaker** (first name, last name, type, optional organisation). The type sets the lanyard colour. They are checked in straight away and saved to a separate `Guests` tab. Types and colours are set in `public/config.js` (`GUEST_TYPES`, `GUEST_LANYARDS`).
+5. **Walk-in guests and speakers** who aren't on the sheet are added with **+ Add guest / speaker** (first name, last name, type, and optional email, phone and organisation). The type sets the lanyard colour. They are checked in straight away and saved to a separate `Guests` tab. Types and colours are set in `public/config.js` (`GUEST_TYPES`, `GUEST_LANYARDS`).
 
 | Situation | What the desk sees | Action |
 |---|---|---|

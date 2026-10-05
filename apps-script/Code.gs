@@ -12,7 +12,7 @@
  *   GET  ?action=lookup&id=9620&key=K       → single registration (fresh read)
  *   POST {action:'checkin', id, key}        → mark Checked In = Yes + time
  *   POST {action:'undo', id, key}           → revert a check-in
- *   POST {action:'addGuest', firstName, lastName, type, lanyard, org, ref, key}
+ *   POST {action:'addGuest', firstName, lastName, type, lanyard, email, phone, org, ref, key}
  *                                           → add a walk-in guest/speaker (checked in immediately)
  *
  * Guests/speakers live in their own "Guests" tab (created automatically) with ids like G-1, G-2…
@@ -39,11 +39,13 @@ var COLS = {
   checkedInTime: 'checked in time',
 };
 
-var GUEST_HEADERS = ['Guest ID', 'Type', 'First Name', 'Last Name', 'Organisation', 'Lanyard', 'Checked In', 'Checked In Time', 'Ref'];
+var GUEST_HEADERS = ['Guest ID', 'Type', 'First Name', 'Last Name', 'Email', 'Phone', 'Organisation', 'Lanyard', 'Checked In', 'Checked In Time', 'Ref'];
 var GUEST_COLS = {
-  id: 'guest id', type: 'type', firstName: 'first name', lastName: 'last name', org: 'organisation',
-  lanyard: 'lanyard', checkedIn: 'checked in', checkedInTime: 'checked in time', ref: 'ref',
+  id: 'guest id', type: 'type', firstName: 'first name', lastName: 'last name', email: 'email', phone: 'phone',
+  org: 'organisation', lanyard: 'lanyard', checkedIn: 'checked in', checkedInTime: 'checked in time', ref: 'ref',
 };
+// Columns that may be absent (older sheets / optional data). Everything else is required.
+var OPTIONAL_COLS = { paymentStatus: true, org: true, ref: true, phone: true };
 
 var MEMBER_COLS = {
   email: 'primaryemail',
@@ -147,7 +149,7 @@ function setCheckedIn_(id, value) {
   try {
     var guest = isGuestId_(id);
     var sh = guest ? guestSheet_() : sheet_(CONFIG.REG_SHEET);
-    var idx = headerIndex_(sh, guest ? GUEST_COLS : COLS);
+    var idx = guest ? headerIndex_(sh, GUEST_COLS, true) : headerIndex_(sh, COLS);
     var lastRow = sh.getLastRow();
     if (lastRow < 2) return { ok: false, error: 'NOT_FOUND' };
 
@@ -206,12 +208,28 @@ function addGuest_(p) {
     });
     var id = 'G-' + next;
     var ts = now_();
-    var lanyard = guestLanyard_(p.lanyard, p.type);
-    var row = [id, String(p.type || 'Guest').trim(), firstName, lastName, String(p.org || '').trim(), lanyard, 'Yes', ts, ref];
+    var idx = headerIndex_(sh, GUEST_COLS, true);
+    var values = {
+      id: id,
+      type: String(p.type || 'Guest').trim(),
+      firstName: firstName,
+      lastName: lastName,
+      email: String(p.email || '').trim(),
+      phone: String(p.phone || '').trim(),
+      org: String(p.org || '').trim(),
+      lanyard: guestLanyard_(p.lanyard, p.type),
+      checkedIn: 'Yes',
+      checkedInTime: ts,
+      ref: ref,
+    };
+    // Place each value under its header, so column order in the tab doesn't matter.
+    var row = [];
+    for (var c = 0; c < sh.getLastColumn(); c++) row.push('');
+    for (var key in values) if (idx[key] >= 0) row[idx[key]] = values[key];
     var rowNum = sh.getLastRow() + 1;
-    sh.getRange(rowNum, 1, 1, row.length).setNumberFormat('@').setValues([row]);
+    sh.getRange(rowNum, 1, 1, row.length).setNumberFormat('@').setValues([row]); // text: keeps +971… phone numbers intact
     SpreadsheetApp.flush();
-    return { ok: true, record: guestRecord_(row, headerIndex_(sh, GUEST_COLS)) };
+    return { ok: true, record: guestRecord_(row, idx) };
   } finally {
     lock.releaseLock();
   }
@@ -230,13 +248,14 @@ function sheet_(name) {
   return sh;
 }
 
-function headerIndex_(sh, cols) {
+function headerIndex_(sh, cols, guestTab) {
   var header = sh.getRange(1, 1, 1, sh.getLastColumn()).getDisplayValues()[0]
     .map(function (h) { return String(h).trim().toLowerCase(); });
   var idx = {};
   for (var key in cols) {
     idx[key] = header.indexOf(cols[key]);
-    if (idx[key] < 0 && key !== 'paymentStatus' && key !== 'org' && key !== 'ref') {
+    var optional = OPTIONAL_COLS[key] || (guestTab && key === 'email');
+    if (idx[key] < 0 && !optional) {
       throw new Error('Column "' + cols[key] + '" missing in ' + sh.getName());
     }
   }
@@ -257,6 +276,14 @@ function guestSheet_() {
     sh = ss.insertSheet(CONFIG.GUESTS_SHEET);
     sh.getRange(1, 1, 1, GUEST_HEADERS.length).setValues([GUEST_HEADERS]).setFontWeight('bold');
     sh.setFrozenRows(1);
+    return sh;
+  }
+  // Tab created by an earlier version: append any columns it's missing (e.g. Email, Phone).
+  var header = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getDisplayValues()[0]
+    .map(function (h) { return String(h).trim().toLowerCase(); });
+  var missing = GUEST_HEADERS.filter(function (h) { return header.indexOf(h.toLowerCase()) < 0; });
+  if (missing.length) {
+    sh.getRange(1, sh.getLastColumn() + 1, 1, missing.length).setValues([missing]).setFontWeight('bold');
   }
   return sh;
 }
@@ -264,7 +291,7 @@ function guestSheet_() {
 function readGuests_() {
   var sh = spreadsheet_().getSheetByName(CONFIG.GUESTS_SHEET);
   if (!sh || sh.getLastRow() < 2) return { records: [] };
-  var idx = headerIndex_(sh, GUEST_COLS);
+  var idx = headerIndex_(sh, GUEST_COLS, true);
   var records = sh.getDataRange().getDisplayValues().slice(1)
     .map(function (r) { return guestRecord_(r, idx); })
     .filter(function (g) { return g.id; });
@@ -276,8 +303,9 @@ function guestRecord_(r, idx) {
     id: String(r[idx.id] || '').trim(),
     firstName: String(r[idx.firstName] || '').trim(),
     lastName: String(r[idx.lastName] || '').trim(),
-    email: '',
-    org: String(r[idx.org] || '').trim(),
+    email: idx.email >= 0 ? String(r[idx.email] || '').trim() : '',
+    phone: idx.phone >= 0 ? String(r[idx.phone] || '').trim() : '',
+    org: idx.org >= 0 ? String(r[idx.org] || '').trim() : '',
     guestType: String(r[idx.type] || 'Guest').trim(),
     track: '',
     lanyard: String(r[idx.lanyard] || '').trim().toUpperCase(),

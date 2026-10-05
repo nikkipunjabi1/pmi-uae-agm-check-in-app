@@ -10,7 +10,7 @@ The sheet must contain these tabs (header names matter, column order doesn't):
 |---|---|
 | `registrations` | `ID`, `First Name`, `Last Name`, `Email`, `AI`, `Sustainability`, `Checked In`, `Checked In Time` (`Payment Status` is optional and only used to flag cancelled rows) |
 | `ActiveMembersList` | `Personid`, `Firstname`, `Lastname`, `Primaryemail` |
-| `Guests` | *Created automatically* the first time a guest/speaker is added |
+| `Guests` | *Created automatically* the first time a guest/speaker is added. Columns: Guest ID, Type, First Name, Last Name, Email, Phone, Organisation, Lanyard, Checked In, Checked In Time, Ref. Missing columns are added automatically. |
 
 ## 2. Apps Script backend
 

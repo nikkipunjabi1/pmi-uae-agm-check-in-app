@@ -257,7 +257,7 @@ h2 { font-size: 18px; margin: 0; }
 .btn-guest:hover { background: rgba(124,58,237,.12); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .field { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 12px; }
-.dialog .field input[type=text] { margin: 6px 0 0; }
+.dialog .field input { margin: 6px 0 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .chip { position: relative; }
 .chip input { position: absolute; opacity: 0; pointer-events: none; }
@@ -329,7 +329,7 @@ h2 { font-size: 18px; margin: 0; }
   .seg-btn { padding: 8px 10px; }
 
   /* guest form as a bottom sheet */
-  .dialog { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .dialog { width: 100vw; max-width: 100vw; max-height: 92vh; max-height: 92dvh; overflow-y: auto; margin: auto 0 0; border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
   .dialog-actions .btn { flex: 1; }
   .chip .dot { width: 10px; height: 10px; margin-right: 7px; vertical-align: 0; }
 .chip span { padding: 10px 14px; }

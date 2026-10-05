@@ -323,6 +323,8 @@
       const parts = String(v.text).trim().split(/\s+/);
       $('gFirst').value = parts.shift() || '';
       $('gLast').value = parts.join(' ');
+    } else if (v && v.unrecognised && /^\S+@\S+\.\S+$/.test(String(v.text).trim())) {
+      $('gEmail').value = String(v.text).trim();
     }
     $('guestDialog').showModal();
     $(($('gFirst').value ? 'gLast' : 'gFirst')).focus();
@@ -336,6 +338,8 @@
       lastName: $('gLast').value.trim(),
       type: (f.querySelector('input[name=gType]:checked') || {}).value || 'Guest',
       track: '',
+      email: $('gEmail').value.trim(),
+      phone: $('gPhone').value.trim(),
       org: $('gOrg').value.trim(),
       ref: newRef(),
     };
@@ -346,7 +350,7 @@
     const tmpId = `tmp-${payload.ref.slice(0, 8)}`;
     const at = dubaiNow();
     const rec = {
-      id: tmpId, firstName: payload.firstName, lastName: payload.lastName, email: '', org: payload.org,
+      id: tmpId, firstName: payload.firstName, lastName: payload.lastName, email: payload.email, phone: payload.phone, org: payload.org,
       guestType: payload.type, track: '', lanyard: payload.lanyard, member: 'guest', paymentStatus: '',
       checkedIn: true, time: at, ref: payload.ref,
     };
@@ -382,7 +386,7 @@
     const terms = n.split(/\s+/);
     const out = [];
     for (const r of state.records.values()) {
-      const hay = norm(`${fullName(r)} ${r.email} ${r.org || ''} ${r.id}`);
+      const hay = norm(`${fullName(r)} ${r.email} ${r.phone || ''} ${r.org || ''} ${r.id}`);
       if (terms.every((t) => hay.includes(t))) out.push(r);
       if (out.length >= 8) break;
     }
@@ -665,7 +669,7 @@
     box.innerHTML = `<div class="pop">
       ${lanyardHtml(r)}
       <p class="person-name">${esc(fullName(r))}</p>
-      <p class="person-meta">${esc(r.email || r.org || '')}</p>
+      <p class="person-meta">${esc([r.email, r.phone].filter(Boolean).join(' · ') || r.org || '')}</p>
       <div class="checks">${checks.join('')}</div>
       <div class="actions">${action}<button class="btn btn-secondary next-btn" data-next>Next attendee</button></div>
     </div>`;
@@ -860,7 +864,7 @@
         if (dup) return delay({ ok: true, record: { ...dup }, already: true });
         const n = demoDb.filter(isGuest).length + 1;
         const rec = {
-          id: `G-${n}`, firstName: p.firstName, lastName: p.lastName, email: '', org: p.org || '',
+          id: `G-${n}`, firstName: p.firstName, lastName: p.lastName, email: p.email || '', phone: p.phone || '', org: p.org || '',
           guestType: p.type, track: '', lanyard: p.lanyard, member: 'guest', paymentStatus: '', checkedIn: true, time: dubaiNow(), ref: p.ref,
         };
         demoDb.push(rec);

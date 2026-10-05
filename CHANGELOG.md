@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-05 — v1.4.0
+- Guest / speaker form: optional **Email** and **Phone** fields, saved to the `Guests` tab.
+- Existing `Guests` tabs get the new columns added automatically; values are placed by header name.
+- Guests are searchable by phone; a failed email search pre-fills the guest form's email.
+- Requires an Apps Script redeploy (Manage deployments → Edit → New version).
+
 ## 2026-10-05 — v1.3.1
 - Added **Guest** to the walk-in types (White card).
 

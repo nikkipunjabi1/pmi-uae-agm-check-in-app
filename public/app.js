@@ -7,7 +7,7 @@
   const DEMO = !CFG.API_URL || params.has('demo');
   const POLL_MS = CFG.POLL_MS || 8000;
   const FULL_RELOAD_MS = CFG.FULL_RELOAD_MS || 180000;
-  const REQUEST_TIMEOUT_MS = 20000;
+  const REQUEST_TIMEOUT_MS = 30000;
   const STORE = { key: 'agm26.key', queue: 'agm26.queue' };
 
   const state = {
@@ -99,7 +99,7 @@
     constructor(code, network = false) { super(code); this.code = code; this.network = network; }
   }
 
-  async function api(action, payload = {}) {
+  async function api(action, payload = {}, retried = false) {
     if (DEMO) return demoApi(action, payload);
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
@@ -122,7 +122,11 @@
     let data;
     try { data = await res.json(); } catch (_) { throw new ApiError('BAD_RESPONSE', true); }
     if (!data.ok) {
-      if (data.error === 'UNAUTHORIZED') openKeyDialog('That key was not accepted. Please re-enter it.');
+      if (data.error === 'UNAUTHORIZED') {
+        // Google occasionally drops the request body on a redirect; retry once before blaming the key.
+        if (!retried) return api(action, payload, true);
+        openKeyDialog('That key was not accepted. Please re-enter it.');
+      }
       throw new ApiError(data.error || 'ERROR');
     }
     return data;
@@ -217,16 +221,26 @@
   }
 
   let pollTimer;
-  function schedulePoll(delay = POLL_MS) {
+  let pollFailures = 0;
+  function nextPollDelay() {
+    // Back off (up to 4×) while the backend is struggling, and add jitter so desks don't poll in sync.
+    const base = POLL_MS * Math.min(4, 2 ** pollFailures);
+    return Math.round(base * (0.8 + Math.random() * 0.4));
+  }
+  function schedulePoll(delay) {
     clearTimeout(pollTimer);
     pollTimer = setTimeout(async () => {
       if (!document.hidden && (DEMO || getKey())) {
         try {
           if (!state.loaded) await loadAll(); else await pollStatus();
-        } catch (_) { markSynced(false); }
+          pollFailures = 0;
+        } catch (_) {
+          pollFailures++;
+          markSynced(false);
+        }
       }
       schedulePoll();
-    }, delay);
+    }, delay ?? nextPollDelay());
   }
 
   // ---------------------------------------------------------------- actions

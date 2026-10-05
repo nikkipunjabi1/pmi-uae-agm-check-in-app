@@ -81,6 +81,7 @@ apps-script/
   Code.gs            Google Apps Script backend
   appsscript.json    manifest (timezone Asia/Dubai, web app settings)
 docs/                setup, desk guide, data update, decisions
+tools/loadtest.mjs   simulate 9 desks against the live backend (no writes)
 netlify.toml         publish dir + headers
 ```
 

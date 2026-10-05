@@ -14,9 +14,11 @@ window.APP_CONFIG = {
   GUEST_LANYARDS: { 'Delegate - AI': 'BLUE', 'Delegate - Sustainability': 'GREEN' },
   DEFAULT_GUEST_LANYARD: 'WHITE',
 
-  // How often each desk pulls other desks' check-ins (ms).
-  POLL_MS: 8000,
+  // How often each desk pulls other desks' check-ins (ms). Each desk adds ±20% jitter so
+  // 8–9 phones don't hit the backend at the same moment; slows down automatically on errors.
+  POLL_MS: 15000,
 
   // How often the full registration list is reloaded, to pick up late registrations (ms).
-  FULL_RELOAD_MS: 180000,
+  // (It also reloads immediately whenever the number of registrations changes.)
+  FULL_RELOAD_MS: 600000,
 };

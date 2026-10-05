@@ -22,6 +22,9 @@ var CONFIG = {
   REG_SHEET: 'registrations',
   MEMBERS_SHEET: 'ActiveMembersList',
   GUESTS_SHEET: 'Guests',
+  // Short-lived caches so frequent polling from many desks doesn't re-read the sheet every time.
+  STATUS_CACHE_SECONDS: 5,
+  DATA_CACHE_SECONDS: 120,
   TIMEZONE: 'Asia/Dubai',
   TIME_FORMAT: 'dd-MM-yyyy HH:mm:ss',
 };
@@ -76,23 +79,65 @@ function handle_(p) {
 
     switch (p.action) {
       case 'data':
-        return json_(getData_());
+        return json_(cached_('data', CONFIG.DATA_CACHE_SECONDS, getData_));
       case 'status':
-        return json_(getStatus_());
+        return json_(cached_('status', CONFIG.STATUS_CACHE_SECONDS, getStatus_));
       case 'lookup':
         return json_(lookup_(p.id));
       case 'checkin':
-        return json_(setCheckedIn_(p.id, true));
+        return json_(afterWrite_(setCheckedIn_(p.id, true)));
       case 'undo':
-        return json_(setCheckedIn_(p.id, false));
+        return json_(afterWrite_(setCheckedIn_(p.id, false)));
       case 'addGuest':
-        return json_(addGuest_(p));
+        return json_(afterWrite_(addGuest_(p)));
       default:
         return json_({ ok: false, error: 'UNKNOWN_ACTION' });
     }
   } catch (err) {
     return json_({ ok: false, error: String((err && err.message) || err) });
   }
+}
+
+// ---------- cache ----------
+// CacheService values are limited to 100 KB, so larger payloads are split into chunks.
+
+var CACHE_CHUNK = 90000;
+
+function cached_(name, seconds, build) {
+  var cache = CacheService.getScriptCache();
+  try {
+    var meta = cache.get(name + ':n');
+    if (meta) {
+      var keys = [];
+      for (var i = 0; i < Number(meta); i++) keys.push(name + ':' + i);
+      var parts = cache.getAll(keys);
+      var text = '';
+      for (var j = 0; j < keys.length; j++) {
+        if (parts[keys[j]] == null) { text = null; break; }
+        text += parts[keys[j]];
+      }
+      if (text) return JSON.parse(text);
+    }
+  } catch (_) {}
+
+  var value = build();
+  try {
+    var s = JSON.stringify(value);
+    var out = {};
+    var n = Math.ceil(s.length / CACHE_CHUNK) || 1;
+    for (var k = 0; k < n; k++) out[name + ':' + k] = s.substr(k * CACHE_CHUNK, CACHE_CHUNK);
+    out[name + ':n'] = String(n);
+    cache.putAll(out, seconds);
+  } catch (_) {}
+  return value;
+}
+
+/** Any successful write makes the cached status/data stale. */
+function afterWrite_(result) {
+  if (result && result.ok) {
+    try { CacheService.getScriptCache().removeAll(['status:n', 'data:n']); } catch (_) {}
+  }
+  return result;
 }
 
 // ---------- actions ----------
@@ -145,7 +190,7 @@ function setCheckedIn_(id, value) {
   if (!id) return { ok: false, error: 'MISSING_ID' };
 
   var lock = LockService.getScriptLock();
-  lock.waitLock(20000);
+  lock.waitLock(30000);
   try {
     var guest = isGuestId_(id);
     var sh = guest ? guestSheet_() : sheet_(CONFIG.REG_SHEET);

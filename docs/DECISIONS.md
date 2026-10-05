@@ -21,7 +21,21 @@ The ~36% unmatched rate is because the `ActiveMembersList` tab is out of date. I
 - **The membership list never leaves Google.** The browser only receives `member: email | name | none`, not member phone numbers or emails.
 - **Optimistic UI.** The "Checked in" banner shows immediately. The write happens in the background (Apps Script takes about 1–2 s).
 - **Concurrency.** `LockService` serialises writes. If a row is already `Yes`, the original time is kept and the desk is told "already checked in".
-- **Sync.** Every desk polls a lightweight `status` endpoint every 8 s and reloads everything every 3 min.
+- **Sync.** Every desk polls a lightweight `status` endpoint every ~15 s (±20% jitter, backing off up to 4× while the backend is struggling) and reloads the full list every 10 min, or immediately when the registration count changes.
+- **Server cache.** `status` is cached for 5 s and `data` for 120 s in `CacheService` (split into chunks under the 100 KB limit). Every successful write clears both caches, so a check-in shows up on the other desks' next poll. With 9 desks this means the sheet is read about once every 5 s instead of every time a desk polls.
+
+## Load target
+
+Approx. 8–9 desk phones and ~800 check-ins in the first hour (≈ 1 every 4.5 s across all desks).
+
+| Traffic | Rate |
+|---|---|
+| Status polls (9 desks / 15 s) | ~0.6 req/s, mostly served from cache |
+| Check-ins | ~0.22 req/s, serialised by `LockService` (30 s wait) |
+| Full reloads | 9 per 10 min, plus on page open |
+
+Scans never wait for the network: the registration list is already on the phone, and the Check in button responds immediately (the write happens in the background, with an offline retry queue).
+Measure the live backend with `ACCESS_KEY=… node tools/loadtest.mjs 9 2` (simulates 9 desks; writes nothing).
 - **Offline queue.** Check-ins and guest additions that fail on the network are saved in `localStorage` and retried. Guest additions carry a unique `ref`, so a retry never creates a duplicate.
 - **Access key.** The web app must be "Anyone" so the static site can call it. The key in Script Properties stops strangers from reading attendee data. All calls are POST, so the key is never in a URL.
 - **Header-based columns.** The script finds columns by name, so a re-export with different column order still works.

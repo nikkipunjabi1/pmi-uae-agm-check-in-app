@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-05 — v1.5.0 (performance)
+- Backend: `status` cached 5 s and `data` cached 120 s in CacheService; caches cleared on every write.
+- App: polls every ~15 s with jitter (was 8 s), backs off up to 4× on errors; full reload every 10 min (was 3 min).
+- App: 30 s request timeout; retries once on an unexpected UNAUTHORIZED before asking for the key.
+- Lock wait for writes raised to 30 s.
+- `tools/loadtest.mjs`: simulate 9 desks against the live backend without writing to the sheet.
+- Requires an Apps Script redeploy (Manage deployments → Edit → New version).
+
 ## 2026-10-05 — v1.4.1
 - Fix: walk-in card colour is always derived from the guest type via `config.js`, never from the stored `Lanyard` value (an outdated backend had saved Board Member as Blue).
 

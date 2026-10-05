@@ -584,7 +584,9 @@
     return map[type] || CFG.DEFAULT_GUEST_LANYARD || 'WHITE';
   }
   function lanyardOf(r) {
-    if (isGuest(r)) return (/^(WHITE|BLUE|GREEN|RED|YELLOW)$/.test(r.lanyard) && r.lanyard) || guestLanyard(r.guestType);
+    // The type decides the colour (config.js is the single source of truth); the sheet's Lanyard
+    // column is only a record. This also keeps the screen right if an older backend saved another colour.
+    if (isGuest(r)) return guestLanyard(r.guestType);
     return r.track === 'AI' ? 'BLUE' : r.track === 'SUSTAINABILITY' ? 'GREEN' : '';
   }
   function lanyardSub(r) {

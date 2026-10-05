@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-05 — v1.4.1
+- Fix: walk-in card colour is always derived from the guest type via `config.js`, never from the stored `Lanyard` value (an outdated backend had saved Board Member as Blue).
+
 ## 2026-10-05 — v1.4.0
 - Guest / speaker form: optional **Email** and **Phone** fields, saved to the `Guests` tab.
 - Existing `Guests` tabs get the new columns added automatically; values are placed by header name.

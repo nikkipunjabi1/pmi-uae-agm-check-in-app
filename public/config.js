@@ -6,12 +6,13 @@ window.APP_CONFIG = {
   EVENT_NAME: 'PMI UAE Chapter Annual Gathering Meeting 2026',
 
   // Options in the "Add guest / speaker" form. The first one is pre-selected.
-  GUEST_TYPES: ['Speaker', 'Volunteer', 'VIP', 'Guest', 'Sponsor'],
+  GUEST_TYPES: ['Speaker', 'Board Member', 'VIP', 'Partner', 'Volunteer', 'Delegate - AI', 'Delegate - Sustainability'],
 
-  // Lanyard colour per guest type. Any type not listed gets DEFAULT_GUEST_LANYARD.
-  // (Registrants: AI = BLUE, Sustainability = GREEN.) Colours: BLUE, GREEN, RED, YELLOW.
-  GUEST_LANYARDS: { Speaker: 'RED', Volunteer: 'YELLOW' },
-  DEFAULT_GUEST_LANYARD: 'BLUE',
+  // Card colour per walk-in type. Any type not listed gets DEFAULT_GUEST_LANYARD.
+  // Registered delegates from the sheet: AI = BLUE, Sustainability = GREEN.
+  // Colours: WHITE, BLUE, GREEN, RED, YELLOW.
+  GUEST_LANYARDS: { 'Delegate - AI': 'BLUE', 'Delegate - Sustainability': 'GREEN' },
+  DEFAULT_GUEST_LANYARD: 'WHITE',
 
   // How often each desk pulls other desks' check-ins (ms).
   POLL_MS: 8000,

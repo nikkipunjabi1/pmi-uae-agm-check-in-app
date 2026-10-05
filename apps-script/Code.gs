@@ -289,12 +289,13 @@ function guestRecord_(r, idx) {
   };
 }
 
-// Speakers get red, volunteers yellow, every other guest type blue (the desk sends its colour; this is the fallback).
+// Walk-in delegates get their track colour; every other type (Speaker, Board Member, VIP, Partner,
+// Volunteer, …) gets White. The desk sends its colour; this is the fallback.
 function guestLanyard_(lanyard, type) {
   var l = String(lanyard || '').trim().toUpperCase();
-  if (/^(RED|YELLOW|BLUE|GREEN)$/.test(l)) return l.charAt(0) + l.slice(1).toLowerCase();
+  if (/^(WHITE|BLUE|GREEN|RED|YELLOW)$/.test(l)) return l.charAt(0) + l.slice(1).toLowerCase();
   var t = String(type || '').trim().toLowerCase();
-  return t === 'speaker' ? 'Red' : t === 'volunteer' ? 'Yellow' : 'Blue';
+  return /delegate.*\bai\b/.test(t) ? 'Blue' : /delegate.*sustain/.test(t) ? 'Green' : 'White';
 }
 
 function readMembers_() {

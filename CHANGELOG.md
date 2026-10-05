@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-05 — v1.3.0
+- New card colours: **Board Member, Volunteer, Speaker, VIP, Partner → White**; **Delegate - AI → Blue**; **Delegate - Sustainability → Green**.
+- Walk-in form types: Speaker, Board Member, VIP, Partner, Volunteer, Delegate - AI, Delegate - Sustainability.
+- "Lanyard" wording changed to "Card colour" on screen.
+- Apps Script fallback updated (needs a redeploy: Manage deployments → Edit → New version).
+
 ## 2026-10-03 — v1.2.0
 - Fix: iPhone camera preview was black on first start. Camera permission is now requested before the scan stream opens, and a watchdog restarts the camera if no video arrives.
 - Camera restarts automatically when returning to the app (iOS stops it in the background).

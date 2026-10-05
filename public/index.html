@@ -82,12 +82,11 @@
 
         <div class="card result-card" id="resultCard">
           <div class="result-empty" id="resultEmpty">
-            <p class="muted">Scan a QR code or search for an attendee.<br/>The lanyard colour shows here.</p>
+            <p class="muted">Scan a QR code or search for an attendee.<br/>The card colour shows here.</p>
             <div class="legend">
-              <span class="legend-item"><i class="dot dot-blue"></i>AI → <strong>Blue</strong></span>
-              <span class="legend-item"><i class="dot dot-green"></i>Sustainability → <strong>Green</strong></span>
-              <span class="legend-item"><i class="dot dot-red"></i>Speaker → <strong>Red</strong></span>
-              <span class="legend-item"><i class="dot dot-yellow"></i>Volunteer → <strong>Yellow</strong></span>
+              <span class="legend-item"><i class="dot dot-blue"></i>Delegate · AI → <strong>Blue</strong></span>
+              <span class="legend-item"><i class="dot dot-green"></i>Delegate · Sustainability → <strong>Green</strong></span>
+              <span class="legend-item"><i class="dot dot-white"></i>Speaker · Board · VIP · Partner · Volunteer → <strong>White</strong></span>
             </div>
           </div>
           <div id="result" hidden></div>
@@ -109,7 +108,7 @@
         <p class="muted small" id="listCount"></p>
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Name</th><th>ID</th><th>Lanyard</th><th>Member</th><th>Checked in</th></tr></thead>
+            <thead><tr><th>Name</th><th>ID</th><th>Card</th><th>Member</th><th>Checked in</th></tr></thead>
             <tbody id="listBody"></tbody>
           </table>
         </div>
@@ -147,7 +146,7 @@
         <label class="field">First name<input id="gFirst" type="text" required autocapitalize="words" /></label>
         <label class="field">Last name<input id="gLast" type="text" autocapitalize="words" /></label>
       </div>
-      <div class="field">Type <span class="muted">(sets the lanyard colour)</span><div class="chips" id="gTypes"></div></div>
+      <div class="field">Type <span class="muted">(sets the card colour)</span><div class="chips" id="gTypes"></div></div>
       <label class="field">Organisation <span class="muted">(optional)</span><input id="gOrg" type="text" /></label>
       <div class="dialog-actions">
         <button type="button" class="btn btn-secondary" id="guestCancel">Cancel</button>

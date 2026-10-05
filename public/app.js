@@ -574,27 +574,27 @@
       : 'not synced';
   }
 
-  /** Lanyard colour for a person: registrants by track, guests by type (Speaker red, Volunteer yellow, others blue). */
+  /** Card colour: registered delegates by track (AI blue, Sustainability green); walk-ins by type (see config). */
   function guestLanyard(type) {
     const map = CFG.GUEST_LANYARDS || {};
-    return map[type] || CFG.DEFAULT_GUEST_LANYARD || 'BLUE';
+    return map[type] || CFG.DEFAULT_GUEST_LANYARD || 'WHITE';
   }
   function lanyardOf(r) {
-    if (isGuest(r)) return (/^(BLUE|GREEN|RED|YELLOW)$/.test(r.lanyard) && r.lanyard) || guestLanyard(r.guestType);
+    if (isGuest(r)) return (/^(WHITE|BLUE|GREEN|RED|YELLOW)$/.test(r.lanyard) && r.lanyard) || guestLanyard(r.guestType);
     return r.track === 'AI' ? 'BLUE' : r.track === 'SUSTAINABILITY' ? 'GREEN' : '';
   }
   function lanyardSub(r) {
     if (isGuest(r)) return r.guestType || 'Guest';
-    return r.track === 'AI' ? 'AI track' : 'Sustainability track';
+    return r.track === 'AI' ? 'Delegate · AI' : 'Delegate · Sustainability';
   }
 
   function lanyardHtml(r) {
     const colour = lanyardOf(r);
     if (colour) {
-      return `<div class="lanyard lanyard-${colour.toLowerCase()}"><div class="l-label">Lanyard</div><div class="l-color">${colour}</div><div class="l-track">${esc(lanyardSub(r))}</div></div>`;
+      return `<div class="lanyard lanyard-${colour.toLowerCase()}"><div class="l-label">Card colour</div><div class="l-color">${colour}</div><div class="l-track">${esc(lanyardSub(r))}</div></div>`;
     }
     const why = r.track === 'BOTH' ? 'Registered for both tracks' : 'No track selected';
-    return `<div class="lanyard lanyard-unknown"><div class="l-label">Lanyard</div><div class="l-color">ASK</div><div class="l-track">${why} — ask: AI (Blue) or Sustainability (Green)?</div></div>`;
+    return `<div class="lanyard lanyard-unknown"><div class="l-label">Card colour</div><div class="l-color">ASK</div><div class="l-track">${why} — ask: AI (Blue) or Sustainability (Green)?</div></div>`;
   }
 
   function lanyardWord(r) {
@@ -650,7 +650,7 @@
 
     let action;
     if (r.checkedIn && v.justDone) {
-      action = `<div class="done pop">✓ Checked in — give ${lanyardWord(r)} lanyard<small>${esc(shortTime(r.time))}${busy ? ' · saving…' : ''}</small></div>
+      action = `<div class="done pop">✓ Checked in — give ${lanyardWord(r)} card<small>${esc(shortTime(r.time))}${busy ? ' · saving…' : ''}</small></div>
         <div class="undo-row"><button class="btn-ghost btn-sm" data-undo="${esc(r.id)}" ${busy ? 'disabled' : ''}>Undo</button></div>`;
     } else if (r.checkedIn) {
       action = `<div class="already pop">Already checked in<small>at ${esc(r.time || '—')}</small></div>

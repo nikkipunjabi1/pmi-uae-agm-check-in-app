@@ -151,7 +151,7 @@ h2 { font-size: 18px; margin: 0; }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
 .legend-item { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
 .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
-.dot-blue { background: #3b82f6; } .dot-green { background: #22c55e; } .dot-red { background: #ef4444; } .dot-yellow { background: #facc15; }
+.dot-blue { background: #3b82f6; } .dot-green { background: #22c55e; } .dot-red { background: #ef4444; } .dot-white { background: #fff; box-shadow: 0 0 0 1px #94a3b8; } .dot-yellow { background: #facc15; }
 
 .lanyard {
   border-radius: 14px; padding: 22px 16px; text-align: center; color: #fff; margin-bottom: 16px;
@@ -162,6 +162,7 @@ h2 { font-size: 18px; margin: 0; }
 .lanyard .l-track { font-size: 16px; font-weight: 600; opacity: .95; }
 .lanyard-blue { background: var(--lanyard-blue); }
 .lanyard-green { background: var(--lanyard-green); }
+.lanyard-white { background: #ffffff; color: #0f172a; box-shadow: inset 0 0 0 3px #cbd5e1; }
 .lanyard-red { background: #dc2626; }
 .lanyard-yellow { background: #facc15; color: #1c1400; box-shadow: inset 0 0 0 3px rgba(0,0,0,.12); }
 .lanyard-unknown { background: #475569; }
@@ -216,6 +217,7 @@ h2 { font-size: 18px; margin: 0; }
 .pill-amber { background: rgba(245,158,11,.18); color: #fcd34d; }
 .pill-l-blue { background: rgba(59,130,246,.18); color: #93c5fd; }
 .pill-l-green { background: rgba(34,197,94,.18); color: #86efac; }
+.pill-l-white { background: rgba(255,255,255,.9); color: #0f172a; }
 .pill-l-red { background: rgba(239,68,68,.22); color: #fca5a5; }
 .pill-l-yellow { background: rgba(250,204,21,.2); color: #fde047; }
 .pill-purple { background: rgba(139,92,246,.2); color: #c4b5fd; }

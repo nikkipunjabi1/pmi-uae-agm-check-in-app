@@ -28,15 +28,19 @@ The ~36% unmatched rate is because the `ActiveMembersList` tab is out of date. I
 - **Guests in their own tab.** Walk-in guests and speakers go to `Guests` (IDs `G-1`, `G-2`, …) so a registrations refresh can't wipe them.
 - **No payment information is shown** (all members are treated as paid). The `Payment Status` column is only read to flag cancelled registrations.
 
-## Lanyard colours
+## Card colours
 
-| Who | Colour |
+| Type | Card colour |
 |---|---|
-| Registrant on the AI track | Blue |
-| Registrant on the Sustainability track | Green |
-| Speaker | Red |
-| Volunteer | Yellow |
-| VIP / Guest / Sponsor / any other walk-in | Blue |
+| Board Member | White |
+| Volunteer | White |
+| Speaker | White |
+| VIP | White |
+| Partner | White |
+| Delegate - Sustainability | Green |
+| Delegate - AI | Blue |
+
+Registered delegates take their colour from the sheet's `AI` / `Sustainability` columns. Walk-in delegates who aren't on the sheet can be added with the guest form as "Delegate - AI" or "Delegate - Sustainability".
 
 Guest colours are configured in `public/config.js` (`GUEST_LANYARDS`, `DEFAULT_GUEST_LANYARD`). The colour is also written to the `Lanyard` column of the `Guests` tab.
 

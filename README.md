@@ -20,13 +20,11 @@ Registration desk staff scan an attendee's QR code. The app confirms the registr
 2. **Membership check:** the registration's **Email** is matched (case-insensitive) to **Primaryemail** in `ActiveMembersList`. If the email doesn't match but the first and last name do, the app shows an amber "matched by name" note and still allows check-in.
 3. **Lanyard:** shown as a large coloured banner.
 
-   | Who | Lanyard |
+   | Type | Card colour |
    |---|---|
-   | Registrant, `AI = 1` | **BLUE** |
-   | Registrant, `Sustainability = 1` | **GREEN** |
-   | Speaker | **RED** |
-   | Volunteer | **YELLOW** |
-   | VIP, Guest, Sponsor, any other walk-in | **BLUE** |
+   | Delegate - AI (registrant with `AI = 1`, or walk-in) | **BLUE** |
+   | Delegate - Sustainability (registrant with `Sustainability = 1`, or walk-in) | **GREEN** |
+   | Board Member, Volunteer, Speaker, VIP, Partner | **WHITE** |
 
 4. **Check in** sets `Checked In = Yes` and `Checked In Time = dd-MM-yyyy HH:mm:ss` (Dubai time) on that row.
 5. **Walk-in guests and speakers** who aren't on the sheet are added with **+ Add guest / speaker** (first name, last name, type, optional organisation). The type sets the lanyard colour. They are checked in straight away and saved to a separate `Guests` tab. Types and colours are set in `public/config.js` (`GUEST_TYPES`, `GUEST_LANYARDS`).

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-10-05 — v1.3.1
+- Added **Guest** to the walk-in types (White card).
+
 ## 2026-10-05 — v1.3.0
 - New card colours: **Board Member, Volunteer, Speaker, VIP, Partner → White**; **Delegate - AI → Blue**; **Delegate - Sustainability → Green**.
 - Walk-in form types: Speaker, Board Member, VIP, Partner, Volunteer, Delegate - AI, Delegate - Sustainability.

@@ -6,7 +6,7 @@ window.APP_CONFIG = {
   EVENT_NAME: 'PMI UAE Chapter Annual Gathering Meeting 2026',
 
   // Options in the "Add guest / speaker" form. The first one is pre-selected.
-  GUEST_TYPES: ['Speaker', 'Board Member', 'VIP', 'Partner', 'Volunteer', 'Delegate - AI', 'Delegate - Sustainability'],
+  GUEST_TYPES: ['Speaker', 'Board Member', 'VIP', 'Partner', 'Volunteer', 'Guest', 'Delegate - AI', 'Delegate - Sustainability'],
 
   // Card colour per walk-in type. Any type not listed gets DEFAULT_GUEST_LANYARD.
   // Registered delegates from the sheet: AI = BLUE, Sustainability = GREEN.

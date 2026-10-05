@@ -37,6 +37,7 @@ The ~36% unmatched rate is because the `ActiveMembersList` tab is out of date. I
 | Speaker | White |
 | VIP | White |
 | Partner | White |
+| Guest | White |
 | Delegate - Sustainability | Green |
 | Delegate - AI | Blue |
 

@@ -5,7 +5,7 @@
 ## Before doors open
 1. Open the link you were sent. If asked, enter the **desk access key**.
 2. Tap **Start Scanner** and allow camera access. The back camera should show within about 2 seconds; the app retries by itself if the preview stays black.
-3. Check that the badge at the top right says **● Live**.
+3. Wait until the badge at the top right says **● Live** and the Registered count shows (about 1,059). While it says **Loading registrations… (attempt N)** it is retrying on its own every few seconds. Just wait; don't reload.
 4. Tap the **Powered by Netlify** badge at the bottom → **Hide this badge**. It stays hidden on that phone.
 
 **iPhone:** use Safari. If the camera was blocked: Settings → Safari → Camera → Allow (or tap **aA** in the address bar → Website Settings → Camera → Allow).

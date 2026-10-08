@@ -8,6 +8,8 @@
   const POLL_MS = CFG.POLL_MS || 8000;
   const FULL_RELOAD_MS = CFG.FULL_RELOAD_MS || 180000;
   const REQUEST_TIMEOUT_MS = 30000;
+  const DATA_TIMEOUT_MS = 60000;      // the full list is the biggest, slowest call — give it longer
+  const FIRST_LOAD_RETRY_MS = 5000;   // until the list has loaded once, retry steadily (no backoff)
   const STORE = { key: 'agm26.key', queue: 'agm26.queue' };
 
   const state = {
@@ -19,6 +21,7 @@
     lastSync: 0,
     syncError: false,
     loaded: false,
+    loadAttempts: 0,
   };
 
   const $ = (id) => document.getElementById(id);
@@ -102,7 +105,7 @@
   async function api(action, payload = {}, retried = false) {
     if (DEMO) return demoApi(action, payload);
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(() => ctrl.abort(), action === 'data' ? DATA_TIMEOUT_MS : REQUEST_TIMEOUT_MS);
     let res;
     try {
       // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight.
@@ -134,7 +137,17 @@
 
   // ---------------------------------------------------------------- data sync
 
-  async function loadAll() {
+  // Only one full-list download at a time: a slow one must not be overlapped by retries.
+  let loadInFlight = null;
+  function loadAll() {
+    if (!loadInFlight) {
+      if (!state.loaded) { state.loadAttempts++; renderSync(); }
+      loadInFlight = doLoadAll().finally(() => { loadInFlight = null; });
+    }
+    return loadInFlight;
+  }
+
+  async function doLoadAll() {
     const d = await api('data');
     const fresh = new Map();
     d.records.forEach((r) => fresh.set(r.id, r));
@@ -223,6 +236,8 @@
   let pollTimer;
   let pollFailures = 0;
   function nextPollDelay() {
+    // Before the list has loaded the desk can't work offline yet, so keep retrying steadily.
+    if (!state.loaded) return FIRST_LOAD_RETRY_MS;
     // Back off (up to 4×) while the backend is struggling, and add jitter so desks don't poll in sync.
     const base = POLL_MS * Math.min(4, 2 ** pollFailures);
     return Math.round(base * (0.8 + Math.random() * 0.4));
@@ -230,7 +245,8 @@
   function schedulePoll(delay) {
     clearTimeout(pollTimer);
     pollTimer = setTimeout(async () => {
-      if (!document.hidden && (DEMO || getKey())) {
+      // Keep fetching the list even in the background until it has loaded once; after that, pause while hidden.
+      if ((!document.hidden || !state.loaded) && (DEMO || getKey())) {
         try {
           if (!state.loaded) await loadAll(); else await pollStatus();
           pollFailures = 0;
@@ -582,7 +598,11 @@
     const b = $('syncBadge');
     const q = state.queue.length;
     if (DEMO) { b.textContent = 'Demo mode · sample data'; b.className = 'sync-badge demo'; }
-    else if (!state.loaded && !state.syncError) { b.textContent = 'Connecting…'; b.className = 'sync-badge'; }
+    else if (!state.loaded) {
+      const n = state.loadAttempts;
+      b.textContent = n > 1 ? `Loading registrations… (attempt ${n})` : 'Loading registrations…';
+      b.className = `sync-badge${n > 1 ? ' warn' : ''}`;
+    }
     else if (state.syncError || q) {
       b.textContent = q ? `Offline · ${q} to sync` : 'Reconnecting…';
       b.className = `sync-badge ${q ? 'err' : 'warn'}`;

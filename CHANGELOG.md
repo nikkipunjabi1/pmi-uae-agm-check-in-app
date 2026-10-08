@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-08 — v1.5.1 (first-load reliability)
+- Until the registration list has loaded, the app retries every 5 s (no backoff) and keeps loading even if the phone switches to another app.
+- Only one full-list download runs at a time, so a slow download is never overlapped by retries.
+- Full-list download timeout raised to 60 s (other calls stay at 30 s).
+- Badge shows "Loading registrations… (attempt N)" instead of "Connecting…/Reconnecting…" while loading.
+- No backend change needed.
+
 ## 2026-10-05 — v1.5.0 (performance)
 - Backend: `status` cached 5 s and `data` cached 120 s in CacheService; caches cleared on every write.
 - App: polls every ~15 s with jitter (was 8 s), backs off up to 4× on errors; full reload every 10 min (was 3 min).

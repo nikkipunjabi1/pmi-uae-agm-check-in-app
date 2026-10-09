@@ -1,7 +1,7 @@
 // Runtime configuration. Safe to commit: the backend rejects requests without the desk access key.
 window.APP_CONFIG = {
   // Google Apps Script Web App URL (ends in /exec). Leave empty to run in demo mode with sample data.
-  API_URL: 'https://script.google.com/macros/s/AKfycby6KTD2AJAfByLZiGeee4sdLxCNJ1jIyLtFEdjJwEeOqPwJgnWWRGdqSJr9ozt7cx_s/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbyW002EcvygfsOj_UZQ9dxx-sSrDfpqXgpZxSwcCud2MgrfGq-fhfI291UGZ0HjGFj4/exec',
 
   EVENT_NAME: 'PMI UAE Chapter Annual Gathering Meeting 2026',
 
@@ -22,3 +22,4 @@ window.APP_CONFIG = {
   // (It also reloads immediately whenever the number of registrations changes.)
   FULL_RELOAD_MS: 600000,
 };
+  

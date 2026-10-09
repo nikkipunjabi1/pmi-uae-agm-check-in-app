@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-09 — v1.6.0
+- Guest / speaker form: optional **PMI ID** field, saved to a new `PMI ID` column in the `Guests` tab (added automatically). For new members (joined 8–9 Oct) whose membership hasn't synced to the website yet.
+- No other logic changed. Requires an Apps Script redeploy (Manage deployments → Edit → New version).
+
 ## 2026-10-08 — v1.5.1 (first-load reliability)
 - Until the registration list has loaded, the app retries every 5 s (no backoff) and keeps loading even if the phone switches to another app.
 - Only one full-list download runs at a time, so a slow download is never overlapped by retries.

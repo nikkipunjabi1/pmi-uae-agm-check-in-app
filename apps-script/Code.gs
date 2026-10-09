@@ -12,7 +12,7 @@
  *   GET  ?action=lookup&id=9620&key=K       → single registration (fresh read)
  *   POST {action:'checkin', id, key}        → mark Checked In = Yes + time
  *   POST {action:'undo', id, key}           → revert a check-in
- *   POST {action:'addGuest', firstName, lastName, type, lanyard, email, phone, org, ref, key}
+ *   POST {action:'addGuest', firstName, lastName, type, lanyard, email, phone, pmiId, org, ref, key}
  *                                           → add a walk-in guest/speaker (checked in immediately)
  *
  * Guests/speakers live in their own "Guests" tab (created automatically) with ids like G-1, G-2…
@@ -42,13 +42,13 @@ var COLS = {
   checkedInTime: 'checked in time',
 };
 
-var GUEST_HEADERS = ['Guest ID', 'Type', 'First Name', 'Last Name', 'Email', 'Phone', 'Organisation', 'Lanyard', 'Checked In', 'Checked In Time', 'Ref'];
+var GUEST_HEADERS = ['Guest ID', 'Type', 'First Name', 'Last Name', 'Email', 'Phone', 'PMI ID', 'Organisation', 'Lanyard', 'Checked In', 'Checked In Time', 'Ref'];
 var GUEST_COLS = {
-  id: 'guest id', type: 'type', firstName: 'first name', lastName: 'last name', email: 'email', phone: 'phone',
+  id: 'guest id', type: 'type', firstName: 'first name', lastName: 'last name', email: 'email', phone: 'phone', pmiId: 'pmi id',
   org: 'organisation', lanyard: 'lanyard', checkedIn: 'checked in', checkedInTime: 'checked in time', ref: 'ref',
 };
 // Columns that may be absent (older sheets / optional data). Everything else is required.
-var OPTIONAL_COLS = { paymentStatus: true, org: true, ref: true, phone: true };
+var OPTIONAL_COLS = { paymentStatus: true, org: true, ref: true, phone: true, pmiId: true };
 
 var MEMBER_COLS = {
   email: 'primaryemail',
@@ -261,6 +261,7 @@ function addGuest_(p) {
       lastName: lastName,
       email: String(p.email || '').trim(),
       phone: String(p.phone || '').trim(),
+      pmiId: String(p.pmiId || '').trim(),
       org: String(p.org || '').trim(),
       lanyard: guestLanyard_(p.lanyard, p.type),
       checkedIn: 'Yes',
@@ -350,6 +351,7 @@ function guestRecord_(r, idx) {
     lastName: String(r[idx.lastName] || '').trim(),
     email: idx.email >= 0 ? String(r[idx.email] || '').trim() : '',
     phone: idx.phone >= 0 ? String(r[idx.phone] || '').trim() : '',
+    pmiId: idx.pmiId >= 0 ? String(r[idx.pmiId] || '').trim() : '',
     org: idx.org >= 0 ? String(r[idx.org] || '').trim() : '',
     guestType: String(r[idx.type] || 'Guest').trim(),
     track: '',
